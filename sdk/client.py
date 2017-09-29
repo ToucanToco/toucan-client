@@ -1,4 +1,8 @@
 import requests
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ToucanClient:
@@ -23,6 +27,11 @@ class ToucanClient:
         self.base_url = base_url
         self.auth = auth
         self.token = token
+
+        logger.info(
+            f'[ToucanClient] new client for project \'{base_url}\' with instance(s): '
+            + ','.join([f'{name}' for name in self.instances.keys()])
+        )
 
     def _build_instances(self, instance_names):
         def base_route(small_app_name):
@@ -63,6 +72,7 @@ class SmallAppRequester:
 
     @property
     def method(self):
+        logger.info('f[SmallAppRequester] http method is \'{route}\'')
         return self._path[-1]
 
     @property
@@ -77,6 +87,8 @@ class SmallAppRequester:
         route += self.options
 
         self.__dict__['_path'] = []
+
+        logger.info('f[SmallAppRequester] route is \'{route}\'')
         return route
 
     def __getattr__(self, key):
