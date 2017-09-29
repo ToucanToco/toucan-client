@@ -19,4 +19,4 @@ small_app.stage = 'staging'  # -> GET 'https://api.some.project.com/config/etl?s
 
 ## Sumerian goddess
 
-> Inanna was the Sumerian goddess of love, beauty, sex, desire, fertility, war, combat, and political power, equivalent to the Akkadian, Babylonian, and Assyrian goddess Ishtar. She was also the patron goddess of the Eanna temple at the city of Uruk, which was her main cult center. She was associated with the planet Venus and her most prominent symbols included the lion and the eight-pointed star.
+> Inanna was the Sumerian goddess of toucans, birds and data, obviously.
