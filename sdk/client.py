@@ -1,3 +1,5 @@
+from typing import Union
+
 import requests
 import logging
 
@@ -22,7 +24,11 @@ class ToucanClient:
     >>> # response.status_code equals 200 if everything went well
     """
 
-    def __init__(self, base_url, instance_names=[], auth=None, token=None):
+    def __init__(self,
+                 base_url: str,
+                 instance_names: Union[list, str] ='',
+                 auth=None,
+                 token=None):
         self.instances = self._build_instances(instance_names)
         self.base_url = base_url
         self.auth = auth
@@ -34,8 +40,8 @@ class ToucanClient:
             ','.join([f'{name}' for name in self.instances.keys()])
         )
 
-    def _build_instances(self, instance_names):
-        def base_route(small_app_name):
+    def _build_instances(self, instance_names: Union[list, str]) -> dict:
+        def base_route(small_app_name: str) -> str:
             return f'{self.base_url}/{small_app_name}'
 
         if isinstance(instance_names, list):
@@ -45,9 +51,10 @@ class ToucanClient:
             }
         elif isinstance(instance_names, str):
             return {instance_names: SmallAppRequester(
-                base_route(instance_names), auth=self.auth)}
+                base_route(instance_names), auth=self.auth)
+            }
 
-    def __getitem__(self, instance_name):
+    def __getitem__(self, instance_name: str) -> SmallAppRequester:
         return self.instances[instance_name]
 
 
@@ -64,7 +71,7 @@ class SmallAppRequester:
     >>> small_app.stage = 'staging'
     """
 
-    def __init__(self, base_route, **kwargs):
+    def __init__(self, base_route: str, **kwargs):
         self.__dict__['_path'] = []
         self.__dict__['kwargs'] = kwargs
         self.__dict__['stage'] = ''
@@ -74,18 +81,18 @@ class SmallAppRequester:
             self.__dict__['base_route'] = base_route[:-1]
 
     @property
-    def method(self):
+    def method(self) -> str:
         logger.info('f[SmallAppRequester] http method is \'{route}\'')
         return self._path[-1]
 
     @property
-    def options(self):
+    def options(self) -> str:
         if self.stage:
             return f'?stage={self.stage}'
         return ''
 
     @property
-    def route(self):
+    def route(self) -> str:
         route = '/'.join([self.base_route] + self._path[:-1])
         route += self.options
 
@@ -94,7 +101,7 @@ class SmallAppRequester:
         logger.info('f[SmallAppRequester] route is \'{route}\'')
         return route
 
-    def __getattr__(self, key):
+    def __getattr__(self, key) -> type:
         self._path.append(key)
         return self
 
@@ -104,6 +111,6 @@ class SmallAppRequester:
         else:
             self.kwargs[key] = value
 
-    def __call__(self):
+    def __call__(self) -> requests.Response:
         func = getattr(requests, self.method)
         return func(self.route, **self.kwargs)

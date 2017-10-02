@@ -16,6 +16,7 @@ class TestSmallAppRequester(TestCase):
         self.small_app = SmallAppRequester(self.base_route)
 
     def test_simple_get(self):
+        """It should build the right URL"""
         _ = self.small_app.config.etl.get
         method = self.small_app.method
         route = self.small_app.route
@@ -23,6 +24,7 @@ class TestSmallAppRequester(TestCase):
         self.assertEqual(route, f'{self.base_route}/config/etl')
 
     def test_simple_get_with_stage(self):
+        """It should build the right URL (with staging stage)"""
         self.small_app.stage = 'staging'
 
         _ = self.small_app.config.etl.get
