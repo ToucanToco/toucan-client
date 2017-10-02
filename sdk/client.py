@@ -7,57 +7,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class ToucanClient:
-    """
-    Small client for sending request to a Toucan Toco back end.
-    The constructor's mandatory parameter is the API base url. One can pass
-    a small app name or a list of small app names, a token or an auth object
-    for authentication.
-
-    >>> # Example: Fetch etl config
-    >>> client = ToucanClient('https://api.some.project.com')
-    >>> small_app = client['my-small-app']
-    >>> etl_config = small_app.config.etl.get()
-    >>>
-    >>> # Example: send a post request with some json data
-    >>> response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
-    >>> # response.status_code equals 200 if everything went well
-    """
-
-    def __init__(self,
-                 base_url: str,
-                 instance_names: Union[list, str] ='',
-                 auth=None,
-                 token=None):
-        self.instances = self._build_instances(instance_names)
-        self.base_url = base_url
-        self.auth = auth
-        self.token = token
-
-        logger.info(
-            f'[ToucanClient] new client for project \'{base_url}\' '
-            'with instance: '
-            ','.join([f'{name}' for name in self.instances.keys()])
-        )
-
-    def _build_instances(self, instance_names: Union[list, str]) -> dict:
-        def base_route(small_app_name: str) -> str:
-            return f'{self.base_url}/{small_app_name}'
-
-        if isinstance(instance_names, list):
-            return {
-                name: SmallAppRequester(base_route(name), auth=self.auth)
-                for name in instance_names
-            }
-        elif isinstance(instance_names, str):
-            return {instance_names: SmallAppRequester(
-                base_route(instance_names), auth=self.auth)
-            }
-
-    def __getitem__(self, instance_name: str) -> SmallAppRequester:
-        return self.instances[instance_name]
-
-
 class SmallAppRequester:
     """
     Tool for sending http request to a server.
@@ -114,3 +63,54 @@ class SmallAppRequester:
     def __call__(self) -> requests.Response:
         func = getattr(requests, self.method)
         return func(self.route, **self.kwargs)
+
+
+class ToucanClient:
+    """
+    Small client for sending request to a Toucan Toco back end.
+    The constructor's mandatory parameter is the API base url. One can pass
+    a small app name or a list of small app names, a token or an auth object
+    for authentication.
+
+    >>> # Example: Fetch etl config
+    >>> client = ToucanClient('https://api.some.project.com')
+    >>> small_app = client['my-small-app']
+    >>> etl_config = small_app.config.etl.get()
+    >>>
+    >>> # Example: send a post request with some json data
+    >>> response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
+    >>> # response.status_code equals 200 if everything went well
+    """
+
+    def __init__(self,
+                 base_url: str,
+                 instance_names: Union[list, str] ='',
+                 auth=None,
+                 token=None):
+        self.instances = self._build_instances(instance_names)
+        self.base_url = base_url
+        self.auth = auth
+        self.token = token
+
+        logger.info(
+            f'[ToucanClient] new client for project \'{base_url}\' '
+            'with instance: '
+            ','.join([f'{name}' for name in self.instances.keys()])
+        )
+
+    def _build_instances(self, instance_names: Union[list, str]) -> dict:
+        def base_route(small_app_name: str) -> str:
+            return f'{self.base_url}/{small_app_name}'
+
+        if isinstance(instance_names, list):
+            return {
+                name: SmallAppRequester(base_route(name), auth=self.auth)
+                for name in instance_names
+            }
+        elif isinstance(instance_names, str):
+            return {instance_names: SmallAppRequester(
+                base_route(instance_names), auth=self.auth)
+            }
+
+    def __getitem__(self, instance_name: str) -> SmallAppRequester:
+        return self.instances[instance_name]
