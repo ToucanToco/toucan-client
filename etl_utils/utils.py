@@ -39,7 +39,8 @@ def roll_up(df, levels, groupby_vars, extra_groupby_cols=[],
     levels_cpy.reverse()
     for top_level in levels_cpy:
         # Aggregation
-        gb_df = getattr(df.groupby(groupby_cols_cpy + extra_groupby_cols)[groupby_vars], agg_func)().reset_index()
+        gb_df = getattr(df.groupby(groupby_cols_cpy + extra_groupby_cols)
+                        [groupby_vars], agg_func)().reset_index()
 
         # Melt-like columns
         gb_df[var_name] = top_level
@@ -94,7 +95,8 @@ def two_values_melt(df, first_value_vars, second_value_vars, var_name, value_nam
 
     # Melt on the first value columns
     melt_first_value = pd.melt(df,
-                               id_vars=[col for col in list(df) if col not in first_value_vars],
+                               id_vars=[col for col in list(
+                                   df) if col not in first_value_vars],
                                value_vars=first_value_vars,
                                var_name=var_name,
                                value_name=value_name_first)
@@ -102,7 +104,8 @@ def two_values_melt(df, first_value_vars, second_value_vars, var_name, value_nam
 
     # Melt on the second value columns
     melt_second_value = pd.melt(df,
-                                id_vars=[col for col in list(df) if col not in second_value_vars],
+                                id_vars=[col for col in list(
+                                    df) if col not in second_value_vars],
                                 value_vars=second_value_vars,
                                 var_name=var_name,
                                 value_name=value_name_second)
@@ -126,7 +129,7 @@ def compute_evolution(
         freq=1,
         method='abs',
         format='column',
-        offseted_suffix ='_offseted',
+        offseted_suffix='_offseted',
         evolution_col_name='evolution_computed',
         how='left',
         fillna=None
@@ -159,7 +162,8 @@ def compute_evolution(
     df_offseted = df[id_cols + [date_col, value_col]].copy()
     df_offseted[date_col] += freq
 
-    df_offseted_deduplicated = df_offseted.drop_duplicates(subset=id_cols + [date_col])
+    df_offseted_deduplicated = df_offseted.drop_duplicates(
+        subset=id_cols + [date_col])
 
     if df_offseted_deduplicated.shape[0] != df_offseted.shape[0]:
         logging.getLogger(__name__).warning(
@@ -186,10 +190,13 @@ def compute_evolution(
         del df_with_offseted_values[date_col + '_copy']
 
     if method == 'abs':
-        df_with_offseted_values[evolution_col_name] = df_with_offseted_values[value_col] - df_with_offseted_values[value_col + offseted_suffix]
+        df_with_offseted_values[evolution_col_name] = df_with_offseted_values[value_col] - \
+            df_with_offseted_values[value_col + offseted_suffix]
     elif method == 'pct':
-        df_offseted_value_as_float = df_with_offseted_values[value_col + offseted_suffix].astype(float)
-        df_with_offseted_values[evolution_col_name] = (df_with_offseted_values[value_col].astype(float) - df_offseted_value_as_float) / df_offseted_value_as_float
+        df_offseted_value_as_float = df_with_offseted_values[value_col + offseted_suffix].astype(
+            float)
+        df_with_offseted_values[evolution_col_name] = (df_with_offseted_values[value_col].astype(
+            float) - df_offseted_value_as_float) / df_offseted_value_as_float
     else:
         raise ValueError("method has to be either 'abs' or 'pct'")
 
@@ -247,7 +254,7 @@ def compute_cumsum(
     levels = list(range(0, len(id_cols)))
 
     df = df.groupby(id_cols + reference_cols + cols_to_keep).sum()
-    df = df.groupby(level = levels)[value_cols].cumsum().reset_index()
+    df = df.groupby(level=levels)[value_cols].cumsum().reset_index()
 
     return df
 
@@ -282,7 +289,7 @@ def add_missing_row(df, id_cols, reference_col, complete_index=None):
     2017   2     B      NA NA
     2017   3     B      1  la
 
-	Graphical doc : https://docs.google.com/spreadsheets/d/1mvvozmBNNzVd-xZvdf0Lsq9TVaj0mS5O6qR6aWMcr7o/edit?usp=sharing
+        Graphical doc : https://docs.google.com/spreadsheets/d/1mvvozmBNNzVd-xZvdf0Lsq9TVaj0mS5O6qR6aWMcr7o/edit?usp=sharing
 
     Args:
         df (pd.DataFrame):

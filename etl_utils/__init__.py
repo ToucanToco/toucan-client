@@ -6,4 +6,3 @@ from .utils import (
     add_missing_row,
     compute_ffill_by_group
 )
-
