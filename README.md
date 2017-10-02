@@ -1,8 +1,4 @@
-# Inanna
-
-Inanna is a python client for the Toucan Toco back end.
-
-## Usage
+# Usage
 
 ```python
 client = ToucanClient('https://api.some.project.com')
@@ -16,7 +12,3 @@ response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
 # Example: add staging option
 small_app.stage = 'staging'  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
 ```
-
-## Sumerian goddess
-
-> Inanna was the Sumerian goddess of toucans, birds and data, obviously.
