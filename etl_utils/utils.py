@@ -55,7 +55,8 @@ def roll_up(df, levels, groupby_vars, extra_groupby_cols=[],
     return pd.concat(dfs).reset_index()
 
 
-def two_values_melt(df, first_value_vars, second_value_vars, var_name, value_name):
+def two_values_melt(df, first_value_vars, second_value_vars,
+                    var_name, value_name):
     """
     First, build two DataFrames from the original one: one to compute a melt
     for the value, another one to compute a melt for the evolution. Second,
@@ -118,7 +119,9 @@ def two_values_melt(df, first_value_vars, second_value_vars, var_name, value_nam
 
     on_cols = list(melt_first_value)
     on_cols.remove(value_name_first)
-    return pd.merge(melt_first_value, melt_second_value, on=on_cols, how='outer')
+    return pd.merge(
+        melt_first_value, melt_second_value, on=on_cols, how='outer'
+    )
 
 
 def compute_evolution(
@@ -135,7 +138,8 @@ def compute_evolution(
         fillna=None
 ):
     """
-    Compute an evolution column against a period distant from a fixed frequency.
+    Compute an evolution column against a period distant from a fixed
+    frequency.
 
     Unfortunately, pandas doesn't allow .change() and .pct_change() to be
     executed with a MultiIndex.
@@ -180,23 +184,31 @@ def compute_evolution(
     ).reset_index(drop=True)
 
     if fillna is not None:
-        df_with_offseted_values[
-            [value_col, value_col + offseted_suffix]] = df_with_offseted_values[
-            [value_col, value_col + offseted_suffix]
-        ].fillna(fillna)
+        df_with_offseted_values[[value_col, value_col + offseted_suffix]] = \
+            df_with_offseted_values[
+                [value_col, value_col + offseted_suffix]
+            ].fillna(fillna)
 
     if isinstance(freq, dict):
-        df_with_offseted_values[date_col] = df_with_offseted_values[date_col + '_copy']
+        df_with_offseted_values[date_col] = \
+            df_with_offseted_values[date_col + '_copy']
         del df_with_offseted_values[date_col + '_copy']
 
     if method == 'abs':
-        df_with_offseted_values[evolution_col_name] = df_with_offseted_values[value_col] - \
-            df_with_offseted_values[value_col + offseted_suffix]
+        df_with_offseted_values[evolution_col_name] = (
+            df_with_offseted_values[value_col]
+            - df_with_offseted_values[value_col + offseted_suffix]
+        )
     elif method == 'pct':
-        df_offseted_value_as_float = df_with_offseted_values[value_col + offseted_suffix].astype(
-            float)
-        df_with_offseted_values[evolution_col_name] = (df_with_offseted_values[value_col].astype(
-            float) - df_offseted_value_as_float) / df_offseted_value_as_float
+        df_offseted_value_as_float = \
+            df_with_offseted_values[value_col + offseted_suffix].astype(float)
+        df_with_offseted_values[evolution_col_name] = (
+            (
+                df_with_offseted_values[value_col].astype(float)
+                - df_offseted_value_as_float
+            )
+            / df_offseted_value_as_float
+        )
     else:
         raise ValueError("method has to be either 'abs' or 'pct'")
 
@@ -264,7 +276,8 @@ def add_missing_row(df, id_cols, reference_col, complete_index=None):
     Add missing row to a df base on a reference column
     - `id_cols` are the columns id to group,
     - `reference_col` is the column with groups missing values
-    - `complete_index` (optional) a set of values used to add missing rows, by default use the function `unique` on reference_col
+    - `complete_index` (optional) a set of values used to add missing rows,
+      by default use the function `unique` on reference_col
 
     For example :
 
@@ -288,8 +301,6 @@ def add_missing_row(df, id_cols, reference_col, complete_index=None):
     2017   1     B      1  la
     2017   2     B      NA NA
     2017   3     B      1  la
-
-        Graphical doc : https://docs.google.com/spreadsheets/d/1mvvozmBNNzVd-xZvdf0Lsq9TVaj0mS5O6qR6aWMcr7o/edit?usp=sharing
 
     Args:
         df (pd.DataFrame):
