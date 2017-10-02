@@ -29,8 +29,9 @@ class ToucanClient:
         self.token = token
 
         logger.info(
-            f'[ToucanClient] new client for project \'{base_url}\' with instance(s): '
-            + ','.join([f'{name}' for name in self.instances.keys()])
+            f'[ToucanClient] new client for project \'{base_url}\' '
+            'with instance: '
+            ','.join([f'{name}' for name in self.instances.keys()])
         )
 
     def _build_instances(self, instance_names):
@@ -39,10 +40,12 @@ class ToucanClient:
 
         if isinstance(instance_names, list):
             return {
-                name: SmallAppRequester(base_route(name), auth=self.auth) for name in instance_names
+                name: SmallAppRequester(base_route(name), auth=self.auth)
+                for name in instance_names
             }
         elif isinstance(instance_names, str):
-            return {instance_names: SmallAppRequester(base_route(instance_names), auth=self.auth)}
+            return {instance_names: SmallAppRequester(
+                base_route(instance_names), auth=self.auth)}
 
     def __getitem__(self, instance_name):
         return self.instances[instance_name]
