@@ -1,8 +1,14 @@
-from typing import Union
+import zipfile
+from typing import Union, Dict
 
+import io
+import os
+
+import pandas as pd
 import requests
 import logging
 
+from pandas import DataFrame
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +26,14 @@ class SmallAppRequester:
     >>> small_app.stage = 'staging'
     """
 
+    EXTRACTION_CACHE_PATH = 'extraction_cache'
+
     def __init__(self, base_route: str, **kwargs):
         self.__dict__['_path'] = []
         self.__dict__['kwargs'] = kwargs
         self.__dict__['stage'] = ''
+        self.__dict__['_dfs'] = None
+        self.__dict__['_cache_path'] = None
 
         self.__dict__['base_route'] = base_route
         if base_route.endswith('/'):
@@ -46,9 +56,56 @@ class SmallAppRequester:
         route += self.options
 
         self.__dict__['_path'] = []
-
         logger.info('f[SmallAppRequester] route is \'{route}\'')
         return route
+
+    @property
+    def dfs(self):
+        if self._dfs is None:
+            if os.path.exists(self.EXTRACTION_CACHE_PATH):
+                self.__dict__['_dfs'] = self.read_cache()
+                logger.info('DataFrames extracted from cache')
+            resp = self.sdk.get()
+            dfs = self.cache_dfs(resp.content)
+            self.__dict__['_dfs'] = dfs
+            logger.info('Data fetched and cached')
+        return self._dfs
+
+    def cache_dfs(self, dfs_zip) -> Dict[str, DataFrame]:
+        if not os.path.exists(self.EXTRACTION_CACHE_PATH):
+            os.makedirs(self.EXTRACTION_CACHE_PATH)
+
+        with io.BytesIO(dfs_zip) as bio:
+            with zipfile.ZipFile(bio, mode='r') as zfile:
+                names = zfile.namelist()
+                for name in names:
+                    data = zfile.read(name)
+                    self._write_entry(name, data)
+                return {
+                    name: self._read_entry(name) for name in names
+                }
+
+    def read_cache(self) -> Dict[str, DataFrame]:
+        logger.info(f'Reading data from cache ({self.EXTRACTION_CACHE_PATH})')
+        return {
+            name: self._read_entry(name)
+            for name in os.listdir(self.EXTRACTION_CACHE_PATH)
+        }
+
+    def invalidate_cache(self):
+        self.__dict__['_dfs'] = None
+
+    def _write_entry(self, file_name: str, data: bytes):
+        file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
+        with open(file_path, mode='wb') as f:
+            f.write(data)
+        logger.info(f'Cache entry added: {file_path}')
+
+    def _read_entry(self, file_name) -> DataFrame:
+        file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
+
+        logger.info(f'Reading cache entry: {file_path}')
+        return pd.read_feather(file_path)
 
     def __getattr__(self, key) -> type:
         self._path.append(key)
@@ -61,8 +118,13 @@ class SmallAppRequester:
             self.kwargs[key] = value
 
     def __call__(self) -> requests.Response:
-        func = getattr(requests, self.method)
-        return func(self.route, **self.kwargs)
+        method, route, kwargs = self.method, self.route, self.kwargs
+        func = getattr(requests, method)
+
+        logger.info(
+            f'Sending {method} request to {route} with kwargs: {kwargs}...'
+        )
+        return func(route, **self.kwargs)
 
 
 class ToucanClient:
