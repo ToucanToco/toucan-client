@@ -12,3 +12,10 @@ response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
 # Example: add staging option
 small_app.stage = 'staging'  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
 ```
+
+# Development
+
+## PEP8
+
+New code must be PEP8-valid: tests wont pass if code is not.
+To see PEP8 errors, run `pycodestyle <path_to_file_name>` or recursively: `pycodestyle -r .`
