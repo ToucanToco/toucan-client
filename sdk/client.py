@@ -65,10 +65,11 @@ class SmallAppRequester:
             if os.path.exists(self.EXTRACTION_CACHE_PATH):
                 self.__dict__['_dfs'] = self.read_cache()
                 logger.info('DataFrames extracted from cache')
-            resp = self.sdk.get()
-            dfs = self.cache_dfs(resp.content)
-            self.__dict__['_dfs'] = dfs
-            logger.info('Data fetched and cached')
+            else:
+                resp = self.sdk.get()
+                dfs = self.cache_dfs(resp.content)
+                self.__dict__['_dfs'] = dfs
+                logger.info('Data fetched and cached')
         return self._dfs
 
     def cache_dfs(self, dfs_zip) -> Dict[str, DataFrame]:

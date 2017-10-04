@@ -1,12 +1,14 @@
+import copy
+from collections import namedtuple
+import io
+import tempfile
 from unittest import TestCase
 from unittest.mock import patch
+import zipfile
+
+import pandas as pd
 
 from sdk.client import SmallAppRequester
-
-
-ARGS = 0
-KWARGS = 1
-ROUTE = 0
 
 
 class TestSmallAppRequester(TestCase):
@@ -32,3 +34,29 @@ class TestSmallAppRequester(TestCase):
         route = self.small_app.route
         self.assertEqual(method, 'get')
         self.assertEqual(route, f'{self.base_route}/config/etl?stage=staging')
+
+    @patch('sdk.client.SmallAppRequester.cache_dfs')
+    @patch('sdk.client.SmallAppRequester.read_cache')
+    @patch('requests.get')
+    @patch('os.path.exists')
+    def test_dfs(self, mock_exists, mock_get, mock_read_cache, mock_cache_dfs):
+        """It should use the cache properly"""
+        # 1. Cache directory exists
+        mock_exists.return_value = True
+        mock_get.side_effect = RuntimeError('test')
+        mock_read_cache.return_value = 1
+
+        dfs = self.small_app.dfs
+        self.assertEqual(dfs, 1)
+
+        # 2. No cache
+        mock_exists.return_value = False
+        mock_get.return_value = 1
+        mock_read_cache.side_effect = RuntimeError('test')
+        mock_cache_dfs.return_value = 1
+
+        dfs = self.small_app.dfs
+        self.assertEqual(dfs, 1)
+
+    def test_cache_dfs(self):
+        pass
