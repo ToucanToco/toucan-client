@@ -33,7 +33,7 @@ def roll_up(df, levels, groupby_vars, extra_groupby_cols=[],
         DataFrame:
 
     """
-    dfs = list()
+    dfs = []
     groupby_cols_cpy = list(levels)
     levels_cpy = list(levels)
     levels_cpy.reverse()
