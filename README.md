@@ -1,7 +1,11 @@
 # Usage
 
-[![CircleCI](https://circleci.com/gh/ToucanToco/toucan-client.svg?style=svg)](https://circleci.com/gh/ToucanToco/toucan-client)
-
+[![Pypi-v](https://img.shields.io/pypi/v/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
+[![Pypi-pyversions](https://img.shields.io/pypi/pyversions/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
+[![Pypi-l](https://img.shields.io/pypi/l/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
+[![Pypi-wheel](https://img.shields.io/pypi/wheel/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
+[![CircleCI](https://img.shields.io/circleci/project/github/ToucanToco/toucan-client.svg)](https://circleci.com/gh/ToucanToco/toucan-client)
+[![codecov](https://codecov.io/gh/ToucanToco/laputa/branch/master/graph/badge.svg?token=Ae7jTcHofN)](https://codecov.io/gh/ToucanToco/laputa)
 
 ```python
 client = ToucanClient('https://api.some.project.com')
