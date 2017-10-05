@@ -1,5 +1,8 @@
 # Usage
 
+[![CircleCI](https://circleci.com/gh/ToucanToco/toucan-client.svg?style=svg)](https://circleci.com/gh/ToucanToco/toucan-client)
+
+
 ```python
 client = ToucanClient('https://api.some.project.com')
 small_app = client['my-small-app']
