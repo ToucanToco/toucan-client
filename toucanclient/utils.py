@@ -3,12 +3,14 @@ Contains a series of reusable functions for the data pipeline
 
 TODO: to start filling and organize later
 """
+from __future__ import unicode_literals
+
 import logging
 
 import pandas as pd
 
 
-def roll_up(df, levels, groupby_vars, extra_groupby_cols=[],
+def roll_up(df, levels, groupby_vars, extra_groupby_cols=None,
             var_name='type', value_name='value', agg_func='sum'):
     """
     Move the hierarchy from the columns name to the rows (like a melt).
@@ -33,6 +35,8 @@ def roll_up(df, levels, groupby_vars, extra_groupby_cols=[],
         DataFrame:
 
     """
+    if extra_groupby_cols is None:
+        extra_groupby_cols = []
     dfs = []
     groupby_cols_cpy = list(levels)
     levels_cpy = list(levels)
@@ -223,7 +227,7 @@ def compute_cumsum(
         id_cols,
         reference_cols,
         value_cols,
-        cols_to_keep=[]
+        cols_to_keep=None
 ):
     """
     Compute cumsum for a group of columns.
@@ -259,10 +263,12 @@ def compute_cumsum(
     Args:
         df (pd.DataFrame):
         id_cols (list(str)):
-        cols_to_keep (list(str)):
-        cumsum_cols (list(str)):
-        reference_cols (list(str))
+        reference_cols (list(str)):
+        value_cols (list(str)):
+        cols_to_keep (list(str))
     """
+    if cols_to_keep is None:
+        cols_to_keep = []
     levels = list(range(0, len(id_cols)))
 
     df = df.groupby(id_cols + reference_cols + cols_to_keep).sum()

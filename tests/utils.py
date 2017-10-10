@@ -1,12 +1,12 @@
-import tempfile
-
 import io
+import tempfile
 import zipfile
 
 from pandas import DataFrame
 
 
-def default_zip_file(df: DataFrame, df2: DataFrame) -> bytes:
+def default_zip_file(df, df2):
+    # type: (DataFrame, DataFrame) -> bytes
     """Return zip file with two DF saved using feather."""
     with io.BytesIO() as memory_file:
         with zipfile.ZipFile(memory_file, mode='w') as zfile:

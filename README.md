@@ -24,5 +24,5 @@ small_app.stage = 'staging'  # -> GET 'https://api.some.project.com/config/etl?s
 
 ## PEP8
 
-New code must be PEP8-valid: tests wont pass if code is not.
+New code must be PEP8-valid (with a maximum of 100 chars): tests wont pass if code is not.
 To see PEP8 errors, run `pycodestyle <path_to_file_name>` or recursively: `pycodestyle -r .`

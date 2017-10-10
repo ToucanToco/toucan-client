@@ -1,14 +1,12 @@
-import zipfile
-from typing import Union, Dict
-
 import io
+import logging
 import os
+import zipfile
 
 import pandas as pd
 import requests
-import logging
-
 from pandas import DataFrame
+from typing import Union, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +26,8 @@ class SmallAppRequester:
 
     EXTRACTION_CACHE_PATH = 'extraction_cache'
 
-    def __init__(self, base_route: str, **kwargs):
+    def __init__(self, base_route, **kwargs):
+        # type: (str) -> SmallAppRequester
         self.__dict__['_path'] = []
         self.__dict__['kwargs'] = kwargs
         self.__dict__['stage'] = ''
@@ -40,23 +39,26 @@ class SmallAppRequester:
             self.__dict__['base_route'] = base_route[:-1]
 
     @property
-    def method(self) -> str:
-        logger.info('f[SmallAppRequester] http method is \'{route}\'')
+    def method(self):
+        # type: () -> str
+        logger.info('[SmallAppRequester] http method is \'{route}\'')
         return self._path[-1]
 
     @property
-    def options(self) -> str:
+    def options(self):
+        # type: () -> str
         if self.stage:
-            return f'?stage={self.stage}'
+            return '?stage={}'.format(self.stage)
         return ''
 
     @property
-    def route(self) -> str:
+    def route(self):
+        # type: () -> str
         route = '/'.join([self.base_route] + self._path[:-1])
         route += self.options
 
         self.__dict__['_path'] = []
-        logger.info('f[SmallAppRequester] route is \'{route}\'')
+        logger.info('[SmallAppRequester] route is \'{}\''.format(route))
         return route
 
     @property
@@ -72,7 +74,8 @@ class SmallAppRequester:
                 logger.info('Data fetched and cached')
         return self._dfs
 
-    def cache_dfs(self, dfs_zip) -> Dict[str, DataFrame]:
+    def cache_dfs(self, dfs_zip):
+        # type: (dfs_zip) -> Dict[str, DataFrame]
         if not os.path.exists(self.EXTRACTION_CACHE_PATH):
             os.makedirs(self.EXTRACTION_CACHE_PATH)
 
@@ -86,8 +89,10 @@ class SmallAppRequester:
                     name: self._read_entry(name) for name in names
                 }
 
-    def read_cache(self) -> Dict[str, DataFrame]:
-        logger.info(f'Reading data from cache ({self.EXTRACTION_CACHE_PATH})')
+    def read_cache(self):
+        # type: () -> Dict[str, DataFrame]
+        logger.info(
+            'Reading data from cache ({})'.format(self.EXTRACTION_CACHE_PATH))
         return {
             name: self._read_entry(name)
             for name in os.listdir(self.EXTRACTION_CACHE_PATH)
@@ -96,19 +101,21 @@ class SmallAppRequester:
     def invalidate_cache(self):
         self.__dict__['_dfs'] = None
 
-    def _write_entry(self, file_name: str, data: bytes):
+    def _write_entry(self, file_name, data):
+        # type: (str, bytes) -> None
         file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
         with open(file_path, mode='wb') as f:
             f.write(data)
-        logger.info(f'Cache entry added: {file_path}')
+        logger.info('Cache entry added: {}'.format(file_path))
 
-    def _read_entry(self, file_name) -> DataFrame:
+    def _read_entry(self, file_name):
+        # type: (str) -> pd.DataFrame
         file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
 
-        logger.info(f'Reading cache entry: {file_path}')
+        logger.info('Reading cache entry: {}'.format(file_path))
         return pd.read_feather(file_path)
 
-    def __getattr__(self, key) -> type:
+    def __getattr__(self, key):
         self._path.append(key)
         return self
 
@@ -118,12 +125,14 @@ class SmallAppRequester:
         else:
             self.kwargs[key] = value
 
-    def __call__(self) -> requests.Response:
+    def __call__(self):
+        # type: () -> requests.Response
         method, route, kwargs = self.method, self.route, self.kwargs
         func = getattr(requests, method)
 
         logger.info(
-            f'Sending {method} request to {route} with kwargs: {kwargs}...'
+            'Sending {} request to {} with kwargs: {}...'.format(method, route,
+                                                                 kwargs)
         )
         return func(route, **self.kwargs)
 
@@ -145,25 +154,25 @@ class ToucanClient:
     >>> # response.status_code equals 200 if everything went well
     """
 
-    def __init__(self,
-                 base_url: str,
-                 instance_names: Union[list, str] ='',
-                 auth=None,
-                 token=None):
-        self.instances = self._build_instances(instance_names)
+    def __init__(self, base_url, instance_names='', auth=None, token=None):
+        # type: (str, Union[list, str], Optional[str], Optional[str]) -> None
         self.base_url = base_url
         self.auth = auth
         self.token = token
+        self.instances = self._build_instances(instance_names)
 
         logger.info(
-            f'[ToucanClient] new client for project \'{base_url}\' '
-            'with instance: '
-            ','.join([f'{name}' for name in self.instances.keys()])
+            '[ToucanClient] new client for project \'{}\' with instance: {}'
+            .format(base_url,
+                    ','.join([name for name in self.instances.keys()]))
         )
 
-    def _build_instances(self, instance_names: Union[list, str]) -> dict:
-        def base_route(small_app_name: str) -> str:
-            return f'{self.base_url}/{small_app_name}'
+    def _build_instances(self, instance_names):
+        # type: (Union[list, str]) -> dict
+
+        def base_route(small_app_name):
+            # type: (str) -> str
+            return self.base_url + '/' + small_app_name
 
         if isinstance(instance_names, list):
             return {
@@ -175,5 +184,6 @@ class ToucanClient:
                 base_route(instance_names), auth=self.auth)
             }
 
-    def __getitem__(self, instance_name: str) -> SmallAppRequester:
+    def __getitem__(self, instance_name):
+        # type: (str) -> SmallAppRequester
         return self.instances[instance_name]
