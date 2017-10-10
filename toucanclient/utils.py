@@ -190,23 +190,19 @@ def compute_evolution(
     if fillna is not None:
         df_with_offseted_values[[value_col, value_col + offseted_suffix]] = \
             df_with_offseted_values[
-                [value_col, value_col + offseted_suffix]
-            ].fillna(fillna)
+                [value_col, value_col + offseted_suffix]].fillna(fillna)
 
     if method == 'abs':
         df_with_offseted_values[evolution_col_name] = (
-            df_with_offseted_values[value_col]
-            - df_with_offseted_values[value_col + offseted_suffix]
+            df_with_offseted_values[value_col] -
+            df_with_offseted_values[value_col + offseted_suffix]
         )
     elif method == 'pct':
         df_offseted_value_as_float = \
             df_with_offseted_values[value_col + offseted_suffix].astype(float)
         df_with_offseted_values[evolution_col_name] = (
-            (
-                df_with_offseted_values[value_col].astype(float)
-                - df_offseted_value_as_float
-            )
-            / df_offseted_value_as_float
+            (df_with_offseted_values[value_col].astype(float) -
+             df_offseted_value_as_float) / df_offseted_value_as_float
         )
     else:
         raise ValueError("method has to be either 'abs' or 'pct'")
