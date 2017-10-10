@@ -62,6 +62,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.idea
 
 # Toucan-client specific
 requirements/*.in
