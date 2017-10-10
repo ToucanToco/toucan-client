@@ -1,6 +1,6 @@
 import pytest
 
-from toucanclient.client import SmallAppRequester
+from toucan_client.client import SmallAppRequester
 
 BASE_ROUTE = 'fake.route/my-small-app'
 BASE_ROUTE_2 = 'fake.route/my-small-app/'
@@ -45,9 +45,9 @@ def test_dfs(small_app, mocker):
     mock_exists = mocker.patch('os.path.exists')
     mock_get = mocker.patch('requests.get')
     mock_read_cache = mocker.patch(
-        'toucanclient.client.SmallAppRequester.read_cache')
+        'toucan_client.client.SmallAppRequester.read_cache')
     mock_cache_dfs = mocker.patch(
-        'toucanclient.client.SmallAppRequester.cache_dfs')
+        'toucan_client.client.SmallAppRequester.cache_dfs')
     # 1. Cache directory exists
     mock_exists.return_value = True
     mock_get.side_effect = RuntimeError('test')

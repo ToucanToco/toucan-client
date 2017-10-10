@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from tests.utils import default_zip_file
-from toucanclient.client import SmallAppRequester
+from toucan_client.client import SmallAppRequester
 
 DF = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
 DF2 = pd.DataFrame({'a': ['a', 'b'], 'b': ['c', 'd']})
@@ -57,7 +57,7 @@ def test_invalidate_cache(mocker):
     mock_get = mocker.patch('requests.get')
     mock_get.return_value = Response(content=copy.copy(ZIP_CONTENT))
     mock_cache = mocker.patch(
-        'toucanclient.client.SmallAppRequester.cache_dfs')
+        'toucan_client.client.SmallAppRequester.cache_dfs')
 
     # Cache is empty -> fill it
     _ = small_app.dfs

@@ -1,4 +1,4 @@
-from toucanclient.client import ToucanClient, SmallAppRequester
+from toucan_client.client import ToucanClient, SmallAppRequester
 
 BASE_ROUTE = 'fake.route/my-small-app'
 SMALL_APP_NAME = 'my-small-app'

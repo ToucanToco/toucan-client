@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import pytest
 
-import toucanclient.utils as util
+import toucan_client.utils as util
 
 
 def get_fixture(filename):
