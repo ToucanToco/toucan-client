@@ -1,6 +1,7 @@
 import os
 
 import pandas as pd
+import pytest
 
 import toucanclient.utils as util
 
@@ -137,6 +138,39 @@ def test_compute_evolution():
     assert input_df.shape[1] + 2 == evolution_df.shape[1]
 
 
+def test_compute_evolution_with_duplicates(mocker):
+    """
+    It should print a warning when the dataframe has duplicates
+    """
+    input_df = get_fixture('compute_evolution_duplicates.csv')
+    mock_warning = mocker.patch('logging.Logger.warning')
+    _ = util.compute_evolution(
+        input_df,
+        id_cols=['City', 'Country', 'Region'],
+        date_col='Year',
+        value_col='population',
+        freq=1,
+        method='abs',
+    )
+    mock_warning.assert_called_once()
+
+
+def test_compute_evolution_with_wrong_method():
+    """
+    It should raise a ValueError when the method is not 'abs' or 'pct'
+    """
+    input_df = get_fixture('compute_evolution.csv')
+    with pytest.raises(ValueError):
+        _ = util.compute_evolution(
+            input_df,
+            id_cols=['City', 'Country', 'Region'],
+            date_col='Year',
+            value_col='population',
+            freq=1,
+            method='wrong_method',
+        )
+
+
 def test_compute_cumsum():
     """
     It should compute cumsum
@@ -171,6 +205,7 @@ def test_add_missing_row():
         reference_col='Year'
     )
     assert new_df.shape[0] == 12
+
 
 def test_add_missing_row_use_index():
     """

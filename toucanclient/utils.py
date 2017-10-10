@@ -193,11 +193,6 @@ def compute_evolution(
                 [value_col, value_col + offseted_suffix]
             ].fillna(fillna)
 
-    if isinstance(freq, dict):
-        df_with_offseted_values[date_col] = \
-            df_with_offseted_values[date_col + '_copy']
-        del df_with_offseted_values[date_col + '_copy']
-
     if method == 'abs':
         df_with_offseted_values[evolution_col_name] = (
             df_with_offseted_values[value_col]

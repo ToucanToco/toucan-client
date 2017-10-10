@@ -2,19 +2,27 @@ import pytest
 
 from toucanclient.client import SmallAppRequester
 
-base_route = 'fake.route/my-small-app'
+BASE_ROUTE = 'fake.route/my-small-app'
+BASE_ROUTE_2 = 'fake.route/my-small-app/'
 
 
-@pytest.fixture(scope='module')
-def small_app():
-    return SmallAppRequester(base_route)
+@pytest.fixture(name='small_app', scope='module')
+def gen_small_app():
+    return SmallAppRequester(BASE_ROUTE)
 
 
 def test_simple_get(small_app):
     """It should build the right URL"""
     _ = small_app.config.etl.get
     assert small_app.method == 'get'
-    assert small_app.route == '{}/config/etl'.format(base_route)
+    assert small_app.route == '{}/config/etl'.format(BASE_ROUTE)
+
+
+def test_simple_get_with_baseroute_2():
+    small_app = SmallAppRequester(BASE_ROUTE_2)
+    _ = small_app.config.etl.get
+    assert small_app.method == 'get'
+    assert small_app.route == '{}/config/etl'.format(BASE_ROUTE)
 
 
 def test_simple_get_with_stage(small_app):
@@ -22,7 +30,14 @@ def test_simple_get_with_stage(small_app):
     small_app.stage = 'staging'
     _ = small_app.config.etl.get
     assert small_app.method == 'get'
-    assert small_app.route == '{}/config/etl?stage=staging'.format(base_route)
+    assert small_app.route == '{}/config/etl?stage=staging'.format(BASE_ROUTE)
+
+
+def test_kwargs(small_app):
+    """It should add kwargs"""
+    small_app.best_character = 'Ryu'
+    _ = small_app.config.etl.get
+    assert small_app.kwargs == {'best_character': 'Ryu'}
 
 
 def test_dfs(small_app, mocker):
@@ -49,7 +64,3 @@ def test_dfs(small_app, mocker):
 
     dfs = small_app.dfs
     assert dfs == 1
-
-
-def test_cache_dfs():
-    pass
