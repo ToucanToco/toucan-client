@@ -5,8 +5,6 @@ import zipfile
 
 import pandas as pd
 import requests
-from pandas import DataFrame
-from typing import Union, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +39,6 @@ class SmallAppRequester:
     @property
     def method(self):
         # type: () -> str
-        logger.info('[SmallAppRequester] http method is \'{route}\'')
         return self._path[-1]
 
     @property
@@ -58,7 +55,6 @@ class SmallAppRequester:
         route += self.options
 
         self.__dict__['_path'] = []
-        logger.info('[SmallAppRequester] route is \'{}\''.format(route))
         return route
 
     @property
@@ -127,13 +123,8 @@ class SmallAppRequester:
 
     def __call__(self):
         # type: () -> requests.Response
-        method, route, kwargs = self.method, self.route, self.kwargs
+        method, route = self.method, self.route
         func = getattr(requests, method)
-
-        logger.info(
-            'Sending {} request to {} with kwargs: {}...'.format(method, route,
-                                                                 kwargs)
-        )
         return func(route, **self.kwargs)
 
 
@@ -156,9 +147,15 @@ class ToucanClient:
 
     def __init__(self, base_url, instance_names='', auth=None, token=None):
         # type: (str, Union[list, str], Optional[str], Optional[str]) -> None
+        self.requests_kwargs = {}
+        if auth is not None:
+            self.requests_kwargs['auth'] = requests.auth.HTTPBasicAuth(*auth)
+        elif token is not None:
+            self.requests_kwargs['headers'] = {
+                "Authorization": "Bearer {}".format(token)
+            }
+
         self.base_url = base_url
-        self.auth = auth
-        self.token = token
         self.instances = self._build_instances(instance_names)
 
         logger.info(
@@ -176,12 +173,12 @@ class ToucanClient:
 
         if isinstance(instance_names, list):
             return {
-                name: SmallAppRequester(base_route(name), auth=self.auth)
+                name: SmallAppRequester(base_route(name), **self.requests_kwargs)
                 for name in instance_names
             }
         elif isinstance(instance_names, str):
             return {instance_names: SmallAppRequester(
-                base_route(instance_names), auth=self.auth)
+                base_route(instance_names), **self.requests_kwargs)
             }
 
     def __getitem__(self, instance_name):
