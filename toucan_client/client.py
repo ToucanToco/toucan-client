@@ -173,7 +173,8 @@ class ToucanClient:
 
         if isinstance(instance_names, list):
             return {
-                name: SmallAppRequester(base_route(name), **self.requests_kwargs)
+                name: SmallAppRequester(base_route(name),
+                                        **self.requests_kwargs)
                 for name in instance_names
             }
         elif isinstance(instance_names, str):
