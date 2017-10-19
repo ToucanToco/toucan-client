@@ -28,7 +28,7 @@ def test_cache(small_app, mocker):
 
     # Cache is empty -> fill it
     dfs = small_app.dfs
-    mock_get.assert_called_once()
+    assert mock_get.call_count == 1
     assert isinstance(dfs, dict)
     assert 'df' in dfs
     assert 'df2' in dfs
@@ -61,7 +61,7 @@ def test_invalidate_cache(mocker):
 
     # Cache is empty -> fill it
     _ = small_app.dfs
-    mock_cache.assert_called_once()
+    assert mock_cache.call_count == 1
     mock_cache.reset_mock()
 
     # Cache is already filled
@@ -72,4 +72,4 @@ def test_invalidate_cache(mocker):
 
     # Cache has been invalidated
     _ = small_app.dfs
-    mock_cache.assert_called_once()
+    assert mock_cache.call_count == 1

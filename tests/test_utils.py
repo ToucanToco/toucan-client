@@ -152,7 +152,7 @@ def test_compute_evolution_with_duplicates(mocker):
         freq=1,
         method='abs',
     )
-    mock_warning.assert_called_once()
+    assert mock_warning.call_count == 1
 
 
 def test_compute_evolution_with_wrong_method():
