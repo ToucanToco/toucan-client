@@ -1,19 +1,50 @@
-from toucan_client.client import ToucanClient, SmallAppRequester
+import pytest
 
-BASE_ROUTE = 'fake.route/my-small-app'
+from toucan_client.client import ToucanClient
+
 SMALL_APP_NAME = 'my-small-app'
 
+BASE_ROUTE = 'fake.route/my-small-app'
+BASE_ROUTE_2 = 'fake.route/my-small-app/'
 
-def test_toucanclient():
-    """It should create a ToucanClient from one or multiple small-app(s)"""
-    client = ToucanClient('fake.route', SMALL_APP_NAME, auth=('user', '123'))
-    assert len(client.instances) == 1
-    small_app = client[SMALL_APP_NAME]
-    assert isinstance(small_app, SmallAppRequester)
-    assert small_app.route == BASE_ROUTE
-    assert small_app.kwargs['auth'].username == 'user'
 
-    client = ToucanClient(BASE_ROUTE, ['sa1', 'sa2', 'sa3'], token='ABC')
-    assert len(client.instances) == 3
-    small_app = client['sa1']
-    assert small_app.kwargs['headers']['Authorization'] == 'Bearer ABC'
+@pytest.fixture(name='small_app', scope='function')
+def gen_small_app():
+    return ToucanClient(BASE_ROUTE)
+
+
+def test_simple_get(small_app):
+    """It should build the right URL"""
+    _ = small_app.config.etl.get
+    assert small_app.method == 'get'
+    assert small_app.route == '{}/config/etl'.format(BASE_ROUTE)
+
+
+def test_simple_get_with_baseroute_2():
+    small_app = ToucanClient(BASE_ROUTE_2)
+    _ = small_app.config.etl.get
+    assert small_app.method == 'get'
+    assert small_app.route == '{}/config/etl'.format(BASE_ROUTE)
+
+
+def test_simple_get_with_stage(small_app):
+    """It should build the right URL (with staging stage)"""
+    small_app.stage = 'staging'
+    _ = small_app.config.etl.get
+    assert small_app.method == 'get'
+    assert small_app.route == '{}/config/etl?stage=staging'.format(BASE_ROUTE)
+
+
+def test_call(small_app, mocker):
+    mock_getattr = mocker.patch('requests.get')
+    mock_getattr.return_value = 1
+    mock_getattr.return_value = 1
+    res = small_app.config.etl.get()
+    assert res == 1
+
+
+def test_kwargs(small_app):
+    """It should add kwargs"""
+    small_app.best_character = 'Ryu'
+    _ = small_app.config.etl.get
+    assert small_app.kwargs == {'best_character': 'Ryu'}
