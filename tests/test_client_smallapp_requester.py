@@ -1,7 +1,4 @@
-from unittest import mock
-
 import pytest
-from mock import patch
 
 from toucan_client.client import SmallAppRequester
 
@@ -36,11 +33,12 @@ def test_simple_get_with_stage(small_app):
     assert small_app.route == '{}/config/etl?stage=staging'.format(BASE_ROUTE)
 
 
-def test_call(small_app):
-    with patch('requests.get') as mock_getattr:
-        mock_getattr.return_value = 1
-        res = small_app.config.etl.get()
-        assert res == 1
+def test_call(small_app, mocker):
+    mock_getattr = mocker.patch('requests.get')
+    mock_getattr.return_value = 1
+    mock_getattr.return_value = 1
+    res = small_app.config.etl.get()
+    assert res == 1
 
 
 def test_kwargs(small_app):
