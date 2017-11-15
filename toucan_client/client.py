@@ -1,9 +1,5 @@
-import io
 import logging
-import os
-import zipfile
 
-import pandas as pd
 import requests
 
 logger = logging.getLogger(__name__)
@@ -56,60 +52,6 @@ class SmallAppRequester:
 
         self.__dict__['_path'] = []
         return route
-
-    @property
-    def dfs(self):
-        if self._dfs is None:
-            if os.path.exists(self.EXTRACTION_CACHE_PATH):
-                self.__dict__['_dfs'] = self.read_cache()
-                logger.info('DataFrames extracted from cache')
-            else:
-                resp = self.sdk.get()
-                dfs = self.cache_dfs(resp.content)
-                self.__dict__['_dfs'] = dfs
-                logger.info('Data fetched and cached')
-        return self._dfs
-
-    def cache_dfs(self, dfs_zip):
-        # type: (dfs_zip) -> Dict[str, DataFrame]
-        if not os.path.exists(self.EXTRACTION_CACHE_PATH):
-            os.makedirs(self.EXTRACTION_CACHE_PATH)
-
-        with io.BytesIO(dfs_zip) as bio:
-            with zipfile.ZipFile(bio, mode='r') as zfile:
-                names = zfile.namelist()
-                for name in names:
-                    data = zfile.read(name)
-                    self._write_entry(name, data)
-                return {
-                    name: self._read_entry(name) for name in names
-                }
-
-    def read_cache(self):
-        # type: () -> Dict[str, DataFrame]
-        logger.info(
-            'Reading data from cache ({})'.format(self.EXTRACTION_CACHE_PATH))
-        return {
-            name: self._read_entry(name)
-            for name in os.listdir(self.EXTRACTION_CACHE_PATH)
-        }
-
-    def invalidate_cache(self):
-        self.__dict__['_dfs'] = None
-
-    def _write_entry(self, file_name, data):
-        # type: (str, bytes) -> None
-        file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
-        with open(file_path, mode='wb') as f:
-            f.write(data)
-        logger.info('Cache entry added: {}'.format(file_path))
-
-    def _read_entry(self, file_name):
-        # type: (str) -> pd.DataFrame
-        file_path = os.path.join(self.EXTRACTION_CACHE_PATH, file_name)
-
-        logger.info('Reading cache entry: {}'.format(file_path))
-        return pd.read_feather(file_path)
 
     def __getattr__(self, key):
         self._path.append(key)
