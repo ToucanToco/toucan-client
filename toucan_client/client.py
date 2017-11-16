@@ -5,17 +5,21 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-class SmallAppRequester:
+class ToucanClient:
     """
-    Tool for sending http request to a server.
+    Small client for sending request to a Toucan Toco back end.
+    The constructor's mandatory parameter is the API base url. One can pass
+    a small app name or a list of small app names, a token or an auth object
+    for authentication.
 
-    >>> small_app = SmallAppRequester('https://api.some.project.com')
-    >>> small_app.config.etl.get()
-    >>> # -> uses the requests library to send get request to
-    >>> # -> https://api.some.project.com/config/etl
+    >>> # Example: Fetch etl config
+    >>> client = ToucanClient('https://api.some.project.com')
+    >>> small_app = client['my-small-app']
+    >>> etl_config = small_app.config.etl.get()
     >>>
-    >>> # pass stage ->
-    >>> small_app.stage = 'staging'
+    >>> # Example: send a post request with some json data
+    >>> response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
+    >>> # response.status_code equals 200 if everything went well
     """
 
     EXTRACTION_CACHE_PATH = 'extraction_cache'
@@ -68,62 +72,3 @@ class SmallAppRequester:
         method, route = self.method, self.route
         func = getattr(requests, method)
         return func(route, **self.kwargs)
-
-
-class ToucanClient:
-    """
-    Small client for sending request to a Toucan Toco back end.
-    The constructor's mandatory parameter is the API base url. One can pass
-    a small app name or a list of small app names, a token or an auth object
-    for authentication.
-
-    >>> # Example: Fetch etl config
-    >>> client = ToucanClient('https://api.some.project.com')
-    >>> small_app = client['my-small-app']
-    >>> etl_config = small_app.config.etl.get()
-    >>>
-    >>> # Example: send a post request with some json data
-    >>> response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
-    >>> # response.status_code equals 200 if everything went well
-    """
-
-    def __init__(self, base_url, instance_names='', auth=None, token=None):
-        # type: (str, Union[list, str], Optional[str], Optional[str]) -> None
-        self.requests_kwargs = {}
-        if auth is not None:
-            self.requests_kwargs['auth'] = requests.auth.HTTPBasicAuth(*auth)
-        elif token is not None:
-            self.requests_kwargs['headers'] = {
-                "Authorization": "Bearer {}".format(token)
-            }
-
-        self.base_url = base_url
-        self.instances = self._build_instances(instance_names)
-
-        logger.info(
-            '[ToucanClient] new client for project \'{}\' with instance: {}'
-            .format(base_url,
-                    ','.join([name for name in self.instances.keys()]))
-        )
-
-    def _build_instances(self, instance_names):
-        # type: (Union[list, str]) -> dict
-
-        def base_route(small_app_name):
-            # type: (str) -> str
-            return self.base_url + '/' + small_app_name
-
-        if isinstance(instance_names, list):
-            return {
-                name: SmallAppRequester(base_route(name),
-                                        **self.requests_kwargs)
-                for name in instance_names
-            }
-        elif isinstance(instance_names, str):
-            return {instance_names: SmallAppRequester(
-                base_route(instance_names), **self.requests_kwargs)
-            }
-
-    def __getitem__(self, instance_name):
-        # type: (str) -> SmallAppRequester
-        return self.instances[instance_name]
