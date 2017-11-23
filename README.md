@@ -1,5 +1,3 @@
-# Usage
-
 [![Pypi-v](https://img.shields.io/pypi/v/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![Pypi-pyversions](https://img.shields.io/pypi/pyversions/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![Pypi-l](https://img.shields.io/pypi/l/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
@@ -7,10 +5,15 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/ToucanToco/toucan-client.svg)](https://circleci.com/gh/ToucanToco/toucan-client)
 [![codecov](https://codecov.io/gh/ToucanToco/laputa/branch/master/graph/badge.svg?token=Ae7jTcHofN)](https://codecov.io/gh/ToucanToco/laputa)
 
+# Installation
+
+`pip install toucan_client`
+
+# Usage
+
 ```python
-client = ToucanClient('https://api.some.project.com')
-small_app = client['my-small-app']
-etl_config = small_app.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
+client = ToucanClient('https://api.some.project.com/my_small_app')
+etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 
 # Example: send a post request with some json data
 response = small_app.config.etl.put(json={'DATA_SOURCE': ['example']})
