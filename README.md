@@ -3,7 +3,7 @@
 [![Pypi-l](https://img.shields.io/pypi/l/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![Pypi-wheel](https://img.shields.io/pypi/wheel/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![CircleCI](https://img.shields.io/circleci/project/github/ToucanToco/toucan-client.svg)](https://circleci.com/gh/ToucanToco/toucan-client)
-[![codecov](https://codecov.io/gh/ToucanToco/laputa/branch/master/graph/badge.svg?token=Ae7jTcHofN)](https://codecov.io/gh/ToucanToco/laputa)
+[![codecov](https://codecov.io/gh/ToucanToco/toucan-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ToucanToco/toucan-client)
 
 # Installation
 
