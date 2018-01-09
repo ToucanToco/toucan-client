@@ -12,7 +12,12 @@
 # Usage
 
 ```python
-client = ToucanClient('https://api.some.project.com/my_small_app')
+from requests.auth import HTTPBasicAuth
+
+username, password = '###', '###'
+
+auth = HTTPBasicAuth(username, password)
+client = ToucanClient('https://api.some.project.com/my_small_app', auth=auth)
 etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 
 # Example: add staging option
