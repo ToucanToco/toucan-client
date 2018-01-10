@@ -63,12 +63,12 @@ class ToucanClient:
         if not options:
             options = []
         if self.stage:
-            options += [f'stage={self.stage}']
+            options += ['stage={}'.format(self.stage)]
 
         args = '&'.join([arg for arg in options if arg])
         if args:
-            return f'{self.base_route}/{relative_route}?{args}'
-        return f'{self.base_route}/{relative_route}'
+            return '{}/{}?{}'.format(self.base_route, relative_route, args)
+        return '{}/{}'.format(self.base_route, relative_route)
 
     def upload_front_config(self, config_path):
         return self.upload_config_file(config_path, 'config')
@@ -104,7 +104,9 @@ class ToucanClient:
     def upload_template(self, template_path):
         template_type = os.path.basename(os.path.dirname(template_path))
         template_name = os.path.basename(template_path).replace('.cson', '')
-        route = self.build_route(f'templates/{template_type}/{template_name}', ['format=cson'])
+        route = self.build_route(
+            'templates/{}/{}'.format(template_type, template_name),
+            ['format=cson'])
 
         with open(template_path, mode='r') as f:
             return requests.put(
