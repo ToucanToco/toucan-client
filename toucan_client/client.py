@@ -1,6 +1,9 @@
+import json
 import logging
 
+import os
 import requests
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +28,6 @@ class ToucanClient:
     EXTRACTION_CACHE_PATH = 'extraction_cache'
 
     def __init__(self, base_route, **kwargs):
-        # type: (str) -> SmallAppRequester
         self.__dict__['_path'] = []
         self.__dict__['kwargs'] = kwargs
         self.__dict__['stage'] = ''
@@ -56,6 +58,81 @@ class ToucanClient:
 
         self.__dict__['_path'] = []
         return route
+
+    def build_route(self, relative_route, options=None):
+        if not options:
+            options = []
+        if self.stage:
+            options += [f'stage={self.stage}']
+
+        args = '&'.join([arg for arg in options if arg])
+        if args:
+            return f'{self.base_route}/{relative_route}?{args}'
+        return f'{self.base_route}/{relative_route}'
+
+    def upload_front_config(self, config_path):
+        return self.upload_config_file(config_path, 'config')
+
+    def upload_etl_config(self, config_path):
+        return self.upload_config_file(config_path, 'config/etl')
+
+    def upload_preprocess_validation(self, preprocess_validation_path):
+        return self.upload_config_file(preprocess_validation_path, 'config/preprocess_validation')
+
+    def upload_augment_py(self, augment_path):
+        return self.upload_python_module(augment_path, 'config/augment', 'augment.py')
+
+    def upload_permissions_py(self, permissions_path):
+        return self.upload_python_module(permissions_path, 'config/permissions', 'permissions.py')
+
+    def upload_notifications_handler(self, handler_path):
+        return self.upload_python_module(
+            handler_path, 'config/notifications_handlers', 'notifications_handler.py')
+
+    def upload_data_source(self, file_path):
+        file_name = os.path.basename(file_path)
+        route = self.build_route('data/sources')
+
+        with open(file_path, mode='rb') as f:
+            return requests.post(
+                route,
+                files={'file': (file_name, f.read())},
+                data={'data': json.dumps({'filename': file_name})},
+                auth=self.kwargs.get('auth', None)
+            )
+
+    def upload_template(self, template_path):
+        template_type = os.path.basename(os.path.dirname(template_path))
+        template_name = os.path.basename(template_path).replace('.cson', '')
+        route = self.build_route(f'templates/{template_type}/{template_name}', ['format=cson'])
+
+        with open(template_path, mode='r') as f:
+            return requests.put(
+                route,
+                json={'content': f.read(), 'type': template_type, 'name': template_name},
+                auth=self.kwargs.get('auth', None)
+            )
+
+    def upload_config_file(self, config_path, relative_route):
+        options = ['format=cson']
+        route = self.build_route(relative_route, options)
+
+        with open(config_path, mode='rb') as file:
+            return requests.put(
+                route,
+                data=file.read(),
+                auth=self.kwargs.get('auth', None)
+            )
+
+    def upload_python_module(self, module_path, relative_route, file_name):
+        route = self.build_route(relative_route)
+
+        with open(module_path, mode='rb') as file:
+            return requests.put(
+                route,
+                files={'file': (file_name, file.read())},
+                auth=self.kwargs.get('auth', None)
+            )
 
     def __getattr__(self, key):
         self._path.append(key)
