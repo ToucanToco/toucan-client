@@ -117,15 +117,19 @@ def test_upload_python_module(client, requests_wrapper):
 
 def test_upload_template(client, requests_wrapper):
     """Test that upload template method builds the expected request."""
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        template_path = os.path.join(tmp_dir, 'templates/reports/report1.cson')
-        os.makedirs(os.path.dirname(template_path))
-        with open(template_path, mode='w') as file:
+    with tempfile.NamedTemporaryFile(mode='r') as f:
+        with open(f.name, mode='w') as file:
             file.write('aa')
 
-        client.upload_template(template_path)
+        template_type = os.path.basename(os.path.dirname(f.name))
+        template_name = os.path.basename(f.name).replace('.cson', '')
+
+        client.upload_template(f.name)
         route, kwargs = requests_wrapper.put.call_args
-        assert route[0] == BASE_ROUTE + '/templates/reports/report1?format=cson'
+        expected_route = '{}/templates/{}/{}?format=cson'.format(
+            BASE_ROUTE, template_type, template_name)
+
+        assert route[0] == expected_route
         assert kwargs == {
             'json': {'content': 'aa', 'type': 'reports', 'name': 'report1'},
             'auth': None
