@@ -131,7 +131,7 @@ def test_upload_template(client, requests_wrapper):
 
         assert route[0] == expected_route
         assert kwargs == {
-            'json': {'content': 'aa', 'type': 'reports', 'name': 'report1'},
+            'json': {'content': 'aa', 'type': template_type, 'name': template_name},
             'auth': None
         }
 
