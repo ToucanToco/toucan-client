@@ -32,14 +32,14 @@ response = client.config.etl.put()
 The auth parameter can also be an requests.auth.HTTPBasicAuth object.
 
 ### etl_config.cson
-PUT \<api>/config/etl[?stage=staging]
+**PUT** \<api>/config/etl[?stage=staging]
 
 Parameters:
-* files={'file': (< file_name >, \file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (< file_name >, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_etl_config(client: ToucanClient, etl_config_path: str) -> requests.Response
+`upload_etl_config(client: ToucanClient, etl_config_path: str) -> requests.Response`
 
 example
 ```python
@@ -49,14 +49,14 @@ upload_etl_config(client, 'my-small-app/etl_config.cson')
 ```
 
 ### front_config.cson
-PUT \<api>/config[?stage=staging]
+**PUT** \<api>/config[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_front_config(client: ToucanClient, etl_config_path: str) -> requests.Response
+`upload_front_config(client: ToucanClient, etl_config_path: str) -> requests.Response`
 
 example
 ```python
@@ -66,33 +66,32 @@ upload_front_config(client, 'my-small-app/front_config.cson')
 ```
 
 ### preprocess_validation.cson
-PUT \<api>/config/preprocess_validation[?stage=staging]
+**PUT** \<api>/config/preprocess_validation[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_preprocess_validation(client: ToucanClient, etl_config_path: str) -> requests.Response
+`upload_preprocess_validation(client: ToucanClient, etl_config_path: str) -> requests.Response`
 
 example
 ```python
 from toucan_client.utils import upload_preprocess_validation
-
 
 upload_preprocess_validation(client, 'my-small-app/preprocess/preprocess_validation
 .cson')
 ```
 
 ### augment.py
-PUT \<api>/config/augment[?stage=staging]
+**PUT** \<api>/config/augment[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_augment_py(client; ToucanClient, etl_config_path: str) -> requests.Response
+`upload_augment_py(client; ToucanClient, etl_config_path: str) -> requests.Response`
 
 example
 ```python
@@ -102,14 +101,14 @@ upload_augment_py(client, 'my-small-app/preprocess/augment.py')
 ```
 
 ### permissions.py
-PUT \<api>/config/augment[?stage=staging]
+**PUT** \<api>/config/augment[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_permissions_py(client: ToucanClient, permissions_path: str) -> requests.Response
+`upload_permissions_py(client: ToucanClient, permissions_path: str) -> requests.Response`
 
 example
 ```python
@@ -119,14 +118,14 @@ upload_permissions_py(client, 'my-small-app/permissions.py')
 ```
 
 ### notifications_handler.py
-PUT \<api>/config/notifications_handlers[?stage=staging]
+**PUT** \<api>/config/notifications_handlers[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_notifications_handler(client: ToucanClient, handler_path: str) -> requests.Response
+`upload_notifications_handler(client: ToucanClient, handler_path: str) -> requests.Response`
 
 example
 ````python
@@ -136,15 +135,15 @@ upload_notifications_handler(client, 'my-small-app/notifications_handler.py')
 ````
 
 ### data source
-POST \<api>/data/sources[?stage=staging]
+**POST** \<api>/data/sources[?stage=staging]
 
 Parameters:
-* files={'file': (<file_name>, <file_content>)}
-* data={'data': '{"filename": <file_name>}'}
-* auth=(<user_name>, \<password>)
+* files=`{'file': (<file_name>, <file_content>)}`
+* data=`{'data': '{"filename": <file_name>}'}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_data_source(client: ToucanClient, file_path: str) -> requests.Response
+`upload_data_source(client: ToucanClient, file_path: str) -> requests.Response`
 
 example
 ````python
@@ -154,14 +153,14 @@ upload_data_source(client, 'my-small-app/data_sources/test.csv')
 ````
 
 ### template (report/dashboard)
-PUT \<api>/templates/<template_type>/<template_name>[?stage=staging]
+**PUT** \<api>/templates/<template_type>/<template_name>[?stage=staging]
 
 Parameters:
-* json={'content': <file_content>, 'type': <template_type>, 'name': <template_name>}
-* auth=(<user_name>, \<password>)
+* json=`{'content': <file_content>, 'type': <template_type>, 'name': <template_name>}`
+* auth=`(<user_name>, \<password>)`
 
 #### Util function
-upload_template(client: ToucanClient, template_path: str) -> requests.Response
+`upload_template(client: ToucanClient, template_path: str) -> requests.Response`
 
 example
 ````python
@@ -169,7 +168,6 @@ from toucan_client.utils import upload_template
 
 upload_template(client, 'my-small-app/templates/reports/report1.cson')
 ````
-
 
 # Development
 
