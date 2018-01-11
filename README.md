@@ -36,7 +36,7 @@ The auth parameter can also be an requests.auth.HTTPBasicAuth object.
 
 Parameters:
 * files=`{'file': (< file_name >, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_etl_config(client: ToucanClient, etl_config_path: str) -> requests.Response`
@@ -53,7 +53,7 @@ upload_etl_config(client, 'my-small-app/etl_config.cson')
 
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_front_config(client: ToucanClient, etl_config_path: str) -> requests.Response`
@@ -70,7 +70,7 @@ upload_front_config(client, 'my-small-app/front_config.cson')
 
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_preprocess_validation(client: ToucanClient, etl_config_path: str) -> requests.Response`
@@ -88,7 +88,7 @@ upload_preprocess_validation(client, 'my-small-app/preprocess/preprocess_validat
 
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_augment_py(client; ToucanClient, etl_config_path: str) -> requests.Response`
@@ -105,7 +105,7 @@ upload_augment_py(client, 'my-small-app/preprocess/augment.py')
 
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_permissions_py(client: ToucanClient, permissions_path: str) -> requests.Response`
@@ -122,7 +122,7 @@ upload_permissions_py(client, 'my-small-app/permissions.py')
 
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_notifications_handler(client: ToucanClient, handler_path: str) -> requests.Response`
@@ -140,7 +140,7 @@ upload_notifications_handler(client, 'my-small-app/notifications_handler.py')
 Parameters:
 * files=`{'file': (<file_name>, <file_content>)}`
 * data=`{'data': '{"filename": <file_name>}'}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_data_source(client: ToucanClient, file_path: str) -> requests.Response`
@@ -157,7 +157,7 @@ upload_data_source(client, 'my-small-app/data_sources/test.csv')
 
 Parameters:
 * json=`{'content': <file_content>, 'type': <template_type>, 'name': <template_name>}`
-* auth=`(<user_name>, \<password>)`
+* auth=`(<user_name>, <password>)`
 
 #### Util function
 `upload_template(client: ToucanClient, template_path: str) -> requests.Response`
