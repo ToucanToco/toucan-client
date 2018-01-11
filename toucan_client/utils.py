@@ -1,5 +1,7 @@
 import json
 import os
+from collections import namedtuple
+from itertools import takewhile
 
 import requests
 
@@ -91,3 +93,11 @@ def upload_python_module(client, module_path, relative_route, file_name):
             files={'file': (file_name, file.read())},
             auth=client.kwargs.get('auth', None)
         )
+
+
+def filter_call(call):
+    route = list(takewhile(lambda x: '(' not in x, call))
+    func_name = list(takewhile(lambda x: '(' in x, call))[0]  # there is at least one call
+    func_name = func_name.split('(')[0]  # ex: returns get from 'get()'or get(json={bla=True})'
+
+    return route, func_name

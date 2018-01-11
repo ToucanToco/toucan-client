@@ -1,9 +1,39 @@
+import inspect
 import logging
 
 import requests
 
+from toucan_client.utils import build_route, filter_call
 
 logger = logging.getLogger(__name__)
+
+
+API_KEYWORDS = [
+    'config',
+    'etl',
+    'preprocess',
+    'data',
+    'release',
+    'populate',
+    'state',
+    'refresh',
+    'operations',
+    'load',
+    'providers',
+    'sources',
+    'reports',
+    'dashboards',
+    'augment',
+    'permissions',
+    'front',
+    'get',
+
+    # HTTP methods
+    'post',
+    'delete',
+    'put',
+    'patch'
+]
 
 
 class ToucanClient:
@@ -26,15 +56,20 @@ class ToucanClient:
     EXTRACTION_CACHE_PATH = 'extraction_cache'
 
     def __init__(self, base_route, **kwargs):
-        self.__dict__['_path'] = []
-        self.__dict__['kwargs'] = kwargs
-        self.__dict__['stage'] = ''
-        self.__dict__['_dfs'] = None
-        self.__dict__['_cache_path'] = None
+        self.kwargs = kwargs
+        self.stage = kwargs.pop('stage', '')
+        self._base_route = base_route
+        self._paths = []
 
-        self.__dict__['base_route'] = base_route
-        if base_route.endswith('/'):
-            self.__dict__['base_route'] = base_route[:-1]
+        for attr in API_KEYWORDS:
+            setattr(self, attr, self)
+        setattr(self, '__setattr__', self._setattr)
+
+    @property
+    def base_route(self):
+        if self._base_route.endswith('/'):
+            return self._base_route[:-1]
+        return self._base_route
 
     @property
     def method(self):
@@ -51,24 +86,64 @@ class ToucanClient:
     @property
     def route(self):
         # type: () -> str
-        route = '/'.join([self.base_route] + self._path[:-1])
+        route = '/'.join([self.base_route] + self._paths[:-1])
         route += self.options
 
-        self.__dict__['_path'] = []
+        self.__dict__['_paths'] = []
         return route
 
-    def __getattr__(self, key):
-        self._path.append(key)
-        return self
+    def reset_kwargs(self):
+        self.__dict__['kwargs'] = {}
 
-    def __setattr__(self, key, value):
+    def _setattr(self, key, value):
+        """
+        Special attributes (like stage) and kwargs to pass to requests (at
+        each call).
+        """
         if key == 'stage':
-            self.__dict__['stage'] = value
+            self.stage = value
         else:
             self.kwargs[key] = value
 
-    def __call__(self):
+    def __getattr__(self, item):
+        print(f'getattr {item}:: _paths is {self.__dict__["_paths"]}')
+        self.__dict__['_paths'].append(item)
+        return super(ToucanClient, self).__getattr__(item)
+
+    def __objclass__(self):
+        return self.__class__
+
+    def __name__(self):
+        return 'ToucanClient'
+
+    def __call__(self, **kwargs):
+        """
+        Use inspect to find how this method has been called.
+        Example: client.config.etl.get(). The first item on the stack gives us
+        information about the call to __call__, the second one to
+        client.config.etl.get(). The code_context is a list of one string:
+        'client.config.etl.get()'
+
+        Args:
+            **kwargs: pass kwargs to requests.get/post/etc.
+
+        Returns:
+            requests.Response
+
+        """
         # type: () -> requests.Response
-        method, route = self.method, self.route
-        func = getattr(requests, method)
-        return func(route, **self.kwargs)
+        stack = inspect.stack()
+
+        call = stack[1].code_context[0].strip().split('.')  # stack[0] is the call to __call__
+        split = filter_call(call)
+
+        import ipdb; ipdb.set_trace()
+
+        func_name = split.func_name
+        func = getattr(requests, func_name)
+        route = build_route(self, '/'.join(split.route))
+
+        self._paths = []
+
+        kwargs.update(self.kwargs)
+        return func(route, **kwargs)
