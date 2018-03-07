@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import requests
 
 
@@ -31,5 +33,6 @@ class ToucanClient:
         method = self._path[-1]
         method_func = getattr(requests, method)
         url = '/'.join((self._base_route,) + self._path[:-1])
-        requests_kwargs = {**self._requests_kwargs, **kwargs}
+        requests_kwargs = deepcopy(self._requests_kwargs)
+        requests_kwargs.update(kwargs)
         return method_func(url, **requests_kwargs)
