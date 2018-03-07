@@ -17,11 +17,12 @@ client = ToucanClient('https://api.some.project.com/my_small_app', auth=auth)
 etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 
 # Example: add staging option
-client.stage = 'staging'  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
+params = {'stage': 'staging'}
+client.config.etl.get(params=params)  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
 
 # Example: send a post request with some json data
-client.json = {'DATA_SOURCE': ['example']}
-response = client.config.etl.put()
+json = {'DATA_SOURCE': ['example']}
+response = client.config.etl.put(json=json)
 # response.status_code equals 200 if everything went well
 ```
 
