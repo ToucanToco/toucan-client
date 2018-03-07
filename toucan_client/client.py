@@ -3,6 +3,17 @@ from copy import deepcopy
 import requests
 
 
+def build_requests_kwargs(kwargs, extra_kwargs):
+    requests_kwargs = deepcopy(kwargs)
+    requests_kwargs.update(extra_kwargs)
+
+    if "stage" in requests_kwargs:
+        requests_kwargs['params'] = requests_kwargs.get('params', {})
+        requests_kwargs['params'].update({'stage': requests_kwargs.pop('stage')})
+
+    return requests_kwargs
+
+
 class ToucanClient:
     """
     Small client for sending requests to a Toucan Toco backend.
@@ -33,6 +44,5 @@ class ToucanClient:
         method = self._path[-1]
         method_func = getattr(requests, method)
         url = '/'.join((self._base_route,) + self._path[:-1])
-        requests_kwargs = deepcopy(self._requests_kwargs)
-        requests_kwargs.update(kwargs)
+        requests_kwargs = build_requests_kwargs(self._requests_kwargs, kwargs)
         return method_func(url, **requests_kwargs)

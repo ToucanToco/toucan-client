@@ -17,8 +17,7 @@ client = ToucanClient('https://api.some.project.com/my_small_app', auth=auth)
 etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 
 # Example: add staging option
-params = {'stage': 'staging'}
-client.config.etl.get(params=params)  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
+client.config.etl.get(stage='staging')  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
 
 # Example: send a post request with some json data
 json = {'DATA_SOURCE': ['example']}
