@@ -12,17 +12,19 @@
 # Usage
 
 ```python
+# Initialize client
 auth = ('<username>', '<password>')
 client = ToucanClient('https://api.some.project.com/my_small_app', auth=auth)
-etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 
-# Example: add staging option
+# Retrieve ETL config
+etl_config = client.config.etl.get()  # -> GET 'https://api.some.project.com/config/etl'
 client.config.etl.get(stage='staging')  # -> GET 'https://api.some.project.com/config/etl?stage=staging'
 
-# Example: send a post request with some json data
-json = {'DATA_SOURCE': ['example']}
-response = client.config.etl.put(json=json)
-# response.status_code equals 200 if everything went well
+# Operations control, start a preprocess
+client.data.preprocess.post(stage='staging', json={'async': True})
+
+# Operations control, release to prod
+client.data.release.post(stage='staging')
 ```
 
 # Development
