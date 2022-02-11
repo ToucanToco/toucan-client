@@ -2,7 +2,7 @@
 [![Pypi-pyversions](https://img.shields.io/pypi/pyversions/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![Pypi-l](https://img.shields.io/pypi/l/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
 [![Pypi-wheel](https://img.shields.io/pypi/wheel/toucan-client.svg)](https://pypi.python.org/pypi/toucan-client)
-[![CircleCI](https://img.shields.io/circleci/project/github/ToucanToco/toucan-client.svg)](https://circleci.com/gh/ToucanToco/toucan-client)
+[![GitHub Actions](https://github.com/ToucanToco/toucan-client/workflows/CI/badge.svg)](https://github.com/ToucanToco/toucan-client/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/ToucanToco/toucan-client/branch/main/graph/badge.svg)](https://codecov.io/gh/ToucanToco/toucan-client)
 
 # Installation
