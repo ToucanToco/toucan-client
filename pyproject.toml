@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "toucan_client"
-version = "1.0.1"
+version = "1.1.0"
 description = "Toucan API client"
 authors = ["Toucan Toco <dev@toucantoco.com>"]
 readme = "README.md"
