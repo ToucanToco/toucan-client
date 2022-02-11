@@ -1,14 +1,43 @@
+.DEFAULT_GOAL := all
+black = poetry run black toucan_client tests
+isort = poetry run isort toucan_client tests
+
+.PHONY: install
+install:
+	poetry install
+	poetry run pre-commit install
+
+.PHONY: format
+format:
+	poetry run pre-commit run --all-files
+
+.PHONY: lint
+lint:
+	poetry run flake8 toucan_client tests
+	$(black) --diff --check
+	$(isort) --check-only
+
+.PHONY: mypy
+mypy:
+	poetry run mypy .
+
+.PHONY: test
 test:
-	PYTHONPATH=. pytest tests
+	poetry run pytest --cov=toucan_client --cov-report xml --cov-report term-missing
 
+.PHONY: all
+all: lint mypy test
+
+.PHONY: clean
 clean:
-	find . -name \*.pyc -delete
-	find . -name \*.so -delete
-	find . -name __pycache__ -delete
-	rm -rf .coverage build dist *.egg-info
+	rm -rf `find . -name __pycache__`
+	rm -f `find . -type f -name '*.py[co]' `
+	rm -rf .coverage coverage.xml build dist *.egg-info .pytest_cache .mypy_cache
 
+.PHONY: build
 build:
-	python setup.py sdist bdist_wheel
+	poetry build
 
+.PHONY: upload
 upload:
-	twine upload dist/*
+	poetry publish
