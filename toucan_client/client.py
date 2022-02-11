@@ -1,9 +1,10 @@
 from copy import deepcopy
+from typing import Any, Dict, Optional, Tuple
 
 import requests
 
 
-def build_requests_kwargs(kwargs, extra_kwargs):
+def build_requests_kwargs(kwargs: Dict[str, Any], extra_kwargs: Dict[str, Any]) -> Dict[str, Any]:
     requests_kwargs = deepcopy(kwargs)
     requests_kwargs.update(extra_kwargs)
 
@@ -28,19 +29,21 @@ class ToucanClient:
     >>> # response.status_code equals 200 if everything went well
     """
 
-    def __init__(self, base_route, _path=None, **kwargs):
+    def __init__(
+        self, base_route: str, _path: Optional[Tuple[str, ...]] = None, **kwargs: Any
+    ) -> None:
         self._base_route = base_route.strip().rstrip("/")
         self._requests_kwargs = kwargs
         self._path = tuple(_path) if _path else ()
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> "ToucanClient":
         new_path = self._path + (key,)
         return ToucanClient(self._base_route, new_path, **self._requests_kwargs)
 
-    def __getattr__(self, key):
+    def __getattr__(self, key: str) -> "ToucanClient":
         return self[key]  # forward to __getitem__
 
-    def __call__(self, **kwargs):
+    def __call__(self, **kwargs: Any) -> Any:
         method = self._path[-1]
         method_func = getattr(requests, method)
         url = "/".join((self._base_route,) + self._path[:-1])
