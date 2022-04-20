@@ -20,7 +20,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-requests = "^2.27.1"
+requests = "^2.23"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
